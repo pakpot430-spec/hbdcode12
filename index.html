@@ -1,0 +1,1516 @@
+```html
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<title>HBD Omega</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    -webkit-tap-highlight-color:transparent;
+}
+
+html,body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#000;
+}
+
+body{
+    font-family:"Courier New",monospace;
+    color:#d9ffe4;
+}
+
+#app{
+    position:relative;
+    width:100vw;
+    height:100dvh;
+    overflow:hidden;
+    background:
+        radial-gradient(circle at 50% 40%,rgba(0,255,90,.09),transparent 42%),
+        #000;
+}
+
+/* MATRIX */
+#matrix{
+    position:absolute;
+    inset:0;
+    overflow:hidden;
+    opacity:.35;
+    z-index:0;
+}
+
+.code{
+    position:absolute;
+    top:-180px;
+    color:#00ff66;
+    writing-mode:vertical-rl;
+    white-space:nowrap;
+    font-size:11px;
+    line-height:1.6;
+    text-shadow:0 0 8px #00ff66;
+    animation:matrixFall linear infinite;
+}
+
+@keyframes matrixFall{
+    from{transform:translateY(-180px)}
+    to{transform:translateY(120vh)}
+}
+
+/* STARS */
+#decor{
+    position:absolute;
+    inset:0;
+    z-index:1;
+    pointer-events:none;
+}
+
+.star{
+    position:absolute;
+    color:#63ff91;
+    font-size:12px;
+    text-shadow:0 0 10px #00ff66;
+    animation:twinkle 2s ease-in-out infinite;
+}
+
+.star:nth-child(1){top:10%;left:12%}
+.star:nth-child(2){top:20%;right:13%;animation-delay:.7s}
+.star:nth-child(3){top:68%;left:8%;animation-delay:1s}
+.star:nth-child(4){top:76%;right:10%;animation-delay:1.5s}
+.star:nth-child(5){top:35%;left:4%;animation-delay:.3s}
+.star:nth-child(6){top:46%;right:5%;animation-delay:1.2s}
+
+@keyframes twinkle{
+    0%,100%{opacity:.2;transform:scale(.7)}
+    50%{opacity:1;transform:scale(1.4)}
+}
+
+/* HUD */
+.hud{
+    position:absolute;
+    z-index:4;
+    left:18px;
+    right:18px;
+    top:17px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    color:rgba(100,255,140,.5);
+    font-size:9px;
+    letter-spacing:1.5px;
+}
+
+.hud span{
+    padding:5px 7px;
+    border:1px solid rgba(0,255,100,.15);
+    background:rgba(0,30,10,.25);
+    border-radius:4px;
+}
+
+/* CORNERS */
+.corner{
+    position:absolute;
+    width:27px;
+    height:27px;
+    z-index:5;
+    opacity:.35;
+}
+
+.tl{
+    left:15px;
+    top:55px;
+    border-top:1px solid #00ff66;
+    border-left:1px solid #00ff66;
+}
+
+.tr{
+    right:15px;
+    top:55px;
+    border-top:1px solid #00ff66;
+    border-right:1px solid #00ff66;
+}
+
+.bl{
+    left:15px;
+    bottom:18px;
+    border-bottom:1px solid #00ff66;
+    border-left:1px solid #00ff66;
+}
+
+.br{
+    right:15px;
+    bottom:18px;
+    border-bottom:1px solid #00ff66;
+    border-right:1px solid #00ff66;
+}
+
+/* SCREEN */
+.screen{
+    position:absolute;
+    inset:0;
+    z-index:3;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:70px 22px 45px;
+    transition:opacity .8s ease,transform .8s ease,visibility .8s;
+}
+
+.screen.hidden{
+    opacity:0;
+    transform:translateY(20px) scale(.98);
+    visibility:hidden;
+    pointer-events:none;
+}
+
+.content{
+    width:100%;
+    max-width:440px;
+    text-align:center;
+}
+
+/* INTRO */
+.system-label{
+    margin-bottom:18px;
+    font-size:10px;
+    letter-spacing:3px;
+    color:#45ff78;
+    opacity:.7;
+}
+
+.title{
+    color:#caffd7;
+    font-family:Arial,sans-serif;
+    font-size:clamp(31px,9vw,52px);
+    font-weight:800;
+    line-height:1.08;
+    text-shadow:0 0 8px #00ff66,0 0 25px rgba(0,255,100,.45);
+    margin-bottom:25px;
+}
+
+.title::after{
+    content:"▌";
+    color:#00ff66;
+    animation:cursorBlink .8s infinite;
+}
+
+@keyframes cursorBlink{
+    50%{opacity:0}
+}
+
+.intro-text{
+    color:#88ff9f;
+    font-size:13px;
+    line-height:2;
+    margin:auto;
+    max-width:330px;
+}
+
+.warning{
+    display:inline-block;
+    margin-top:12px;
+    color:#ff6782;
+    font-size:11px;
+}
+
+/* =====================================================
+   REAL SLIDER
+===================================================== */
+
+.slide-area{
+    margin-top:38px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+}
+
+.slider{
+    position:relative;
+    width:min(340px,88vw);
+    height:76px;
+    padding:6px;
+
+    border:1px solid rgba(0,255,100,.38);
+    border-radius:40px;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(0,255,100,.08),
+            rgba(0,255,100,.025)
+        );
+
+    box-shadow:
+        0 0 20px rgba(0,255,100,.12),
+        inset 0 0 20px rgba(0,255,100,.04);
+
+    overflow:hidden;
+    touch-action:none;
+}
+
+.slider::before{
+    content:"";
+    position:absolute;
+    inset:3px;
+    border:1px dashed rgba(0,255,100,.12);
+    border-radius:36px;
+    pointer-events:none;
+}
+
+.slider-text{
+    position:absolute;
+    inset:0;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    color:#65ff8a;
+    font-size:10px;
+    letter-spacing:2.5px;
+
+    pointer-events:none;
+    opacity:.75;
+
+    animation:sliderText 1.8s ease-in-out infinite;
+}
+
+@keyframes sliderText{
+    0%,100%{opacity:.35}
+    50%{opacity:.9}
+}
+
+.slider-hint{
+    position:absolute;
+    right:22px;
+    color:rgba(100,255,140,.4);
+    font-size:16px;
+    pointer-events:none;
+}
+
+.slider-thumb{
+    position:absolute;
+    left:6px;
+    top:6px;
+
+    width:64px;
+    height:64px;
+
+    border-radius:50%;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    background:
+        radial-gradient(
+            circle at 35% 30%,
+            #baffc9,
+            #00ff66 65%,
+            #00a83f
+        );
+
+    color:#001b08;
+    font-size:24px;
+    font-weight:bold;
+
+    box-shadow:
+        0 0 15px rgba(0,255,100,.6),
+        0 0 30px rgba(0,255,100,.2);
+
+    cursor:grab;
+    z-index:3;
+
+    user-select:none;
+    touch-action:none;
+
+    transition:box-shadow .2s;
+}
+
+.slider-thumb:active{
+    cursor:grabbing;
+    box-shadow:
+        0 0 25px rgba(0,255,100,.9),
+        0 0 45px rgba(0,255,100,.3);
+}
+
+.slider-status{
+    margin-top:10px;
+    color:rgba(100,255,140,.35);
+    font-size:8px;
+    letter-spacing:2px;
+}
+
+.slider-decor{
+    margin-top:17px;
+    color:rgba(0,255,100,.35);
+    font-size:13px;
+    letter-spacing:8px;
+}
+
+/* GLASS */
+.glass-box{
+    position:relative;
+    width:100%;
+    max-width:430px;
+    padding:40px 23px 30px;
+    border-radius:22px;
+    border:1px solid rgba(100,255,150,.25);
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.075),
+            rgba(0,255,100,.018)
+        );
+
+    backdrop-filter:blur(17px);
+    -webkit-backdrop-filter:blur(17px);
+
+    box-shadow:
+        0 0 40px rgba(0,255,100,.07),
+        inset 0 0 25px rgba(255,255,255,.02);
+}
+
+.glass-box::before{
+    content:"";
+    position:absolute;
+    inset:8px;
+    border:1px solid rgba(0,255,100,.07);
+    border-radius:16px;
+    pointer-events:none;
+}
+
+.glass-tag{
+    position:absolute;
+    top:14px;
+    left:18px;
+    color:rgba(100,255,140,.5);
+    font-size:8px;
+    letter-spacing:2px;
+}
+
+.message{
+    position:relative;
+    z-index:2;
+    min-height:120px;
+    color:#d7ffe0;
+    font-size:14px;
+    line-height:2;
+    text-align:center;
+}
+
+/* BIRD */
+.bird-container{
+    position:absolute;
+    z-index:10;
+    left:-100px;
+    top:20%;
+    opacity:0;
+}
+
+.bird-container.fly{
+    animation:birdFly 2.7s cubic-bezier(.2,.8,.25,1) forwards;
+}
+
+@keyframes birdFly{
+    0%{
+        left:-100px;
+        top:13%;
+        opacity:0;
+        transform:rotate(-10deg);
+    }
+
+    20%{opacity:1}
+
+    55%{top:27%}
+
+    100%{
+        left:calc(50% - 34px);
+        top:calc(50% - 175px);
+        opacity:1;
+        transform:rotate(0);
+    }
+}
+
+.bird{
+    position:relative;
+    width:68px;
+    height:50px;
+}
+
+.bird-body{
+    position:absolute;
+    width:44px;
+    height:32px;
+    left:4px;
+    top:8px;
+    background:#a7ffb9;
+    border-radius:55% 48% 45% 50%;
+    box-shadow:0 0 14px #00ff66;
+}
+
+.bird-body::before{
+    content:"";
+    position:absolute;
+    right:-15px;
+    top:8px;
+    border-top:7px solid transparent;
+    border-bottom:7px solid transparent;
+    border-left:16px solid #a7ffb9;
+}
+
+.bird-eye{
+    position:absolute;
+    right:8px;
+    top:7px;
+    width:5px;
+    height:5px;
+    border-radius:50%;
+    background:#000;
+}
+
+.bird-wing{
+    position:absolute;
+    left:4px;
+    top:2px;
+    width:28px;
+    height:20px;
+    background:#55ff80;
+    border-radius:80% 20% 80% 20%;
+    transform-origin:bottom right;
+    animation:wing .25s alternate infinite;
+}
+
+@keyframes wing{
+    from{transform:rotate(15deg)}
+    to{transform:rotate(-25deg)}
+}
+
+.bird-foot{
+    position:absolute;
+    top:37px;
+    left:20px;
+    width:7px;
+    height:7px;
+    border-bottom:1px solid #9affad;
+    border-radius:50%;
+}
+
+.bird-foot.two{left:30px}
+
+.speech{
+    position:absolute;
+    width:205px;
+    left:50%;
+    top:-65px;
+    transform:translateX(-50%);
+    padding:9px 12px;
+    border:1px solid rgba(0,255,100,.25);
+    border-radius:12px;
+    background:rgba(0,20,8,.9);
+    color:#9cffb0;
+    font-size:10px;
+    text-align:center;
+    opacity:0;
+    transition:.5s;
+}
+
+.speech.show{opacity:1}
+
+/* FIREWORKS */
+#fireworks{
+    position:absolute;
+    inset:0;
+    z-index:20;
+    background:#000;
+    opacity:0;
+    visibility:hidden;
+    transition:opacity .8s;
+}
+
+#fireworks.active{
+    opacity:1;
+    visibility:visible;
+}
+
+#fireCanvas{
+    width:100%;
+    height:100%;
+}
+
+#hbd{
+    position:absolute;
+    inset:0;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-family:Arial,sans-serif;
+    font-size:clamp(95px,29vw,230px);
+    font-weight:900;
+    letter-spacing:7px;
+    color:transparent;
+    -webkit-text-stroke:2px #00ff66;
+    text-shadow:0 0 10px #00ff66,0 0 30px #00ff66,0 0 80px #00ff66;
+    opacity:0;
+    transform:scale(.25);
+    transition:opacity 1.1s,transform 1.5s cubic-bezier(.15,.8,.2,1);
+}
+
+#hbd.show{
+    opacity:1;
+    transform:scale(1);
+}
+
+/* FINAL */
+#finalScreen{
+    z-index:30;
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+    transition:opacity 1s;
+}
+
+#finalScreen.show{
+    opacity:1;
+    visibility:visible;
+    pointer-events:auto;
+}
+
+.final-box{
+    max-height:73vh;
+    overflow-y:auto;
+}
+
+.final-box::-webkit-scrollbar{
+    width:2px;
+}
+
+.final-box::-webkit-scrollbar-thumb{
+    background:#00ff66;
+}
+
+.final-message{
+    color:#d8ffe0;
+    font-size:13px;
+    line-height:2;
+    text-align:left;
+}
+
+.signature{
+    margin-top:25px;
+    color:#4fff78;
+    text-align:right;
+    font-size:10px;
+    line-height:1.8;
+    letter-spacing:1px;
+}
+
+.signature-main{
+    display:block;
+    font-size:13px;
+    color:#9dffb2;
+}
+
+.signature-sub{
+    display:block;
+    margin-top:4px;
+    color:rgba(157,255,178,.55);
+    font-size:9px;
+    font-style:italic;
+}
+
+/* BOTTOM */
+.sticker{
+    position:absolute;
+    bottom:55px;
+    left:50%;
+    transform:translateX(-50%);
+    z-index:4;
+    color:rgba(100,255,140,.35);
+    font-size:9px;
+    letter-spacing:2px;
+    white-space:nowrap;
+}
+
+.sticker::before{
+    content:"♡";
+    margin-right:6px;
+    color:#00ff66;
+}
+
+.sticker::after{
+    content:"♡";
+    margin-left:6px;
+    color:#00ff66;
+}
+
+/* SCANLINES */
+.scanlines{
+    position:absolute;
+    inset:0;
+    z-index:60;
+    pointer-events:none;
+
+    background:
+        repeating-linear-gradient(
+            to bottom,
+            transparent 0,
+            transparent 3px,
+            rgba(0,255,100,.018) 4px
+        );
+}
+
+/* SMALL PHONE */
+@media(max-height:650px){
+
+    .screen{
+        padding-top:60px;
+        padding-bottom:35px;
+    }
+
+    .title{
+        font-size:29px;
+        margin-bottom:15px;
+    }
+
+    .intro-text{
+        font-size:12px;
+        line-height:1.7;
+    }
+
+    .slide-area{
+        margin-top:25px;
+    }
+
+    .slider{
+        height:65px;
+    }
+
+    .slider-thumb{
+        width:53px;
+        height:53px;
+    }
+
+    .glass-box{
+        padding-top:35px;
+    }
+
+    .message{
+        font-size:13px;
+        line-height:1.8;
+    }
+
+    .sticker{
+        bottom:38px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div id="app">
+
+    <div id="matrix"></div>
+
+    <div id="decor">
+        <span class="star">✦</span>
+        <span class="star">+</span>
+        <span class="star">✧</span>
+        <span class="star">·</span>
+        <span class="star">✦</span>
+        <span class="star">+</span>
+    </div>
+
+    <div class="hud">
+        <span>SYS://BIRTHDAY</span>
+        <span>00:00</span>
+    </div>
+
+    <div class="corner tl"></div>
+    <div class="corner tr"></div>
+    <div class="corner bl"></div>
+    <div class="corner br"></div>
+
+
+    <!-- OPENING -->
+
+    <section id="opening" class="screen">
+
+        <div class="content">
+
+            <div class="system-label">
+                CONNECTION_ESTABLISHED
+            </div>
+
+            <h1 class="title">
+                Yah.. asing beneran, ya?
+            </h1>
+
+            <p class="intro-text">
+                haha, gak nyangka banget deh bakal gini.
+                <br>
+                so, geser yang dibawah ya.
+                <br>
+
+                <span class="warning">
+                    awas gak lanjut →
+                </span>
+            </p>
+
+
+            <!-- SLIDER -->
+
+            <div class="slide-area">
+
+                <div class="slider" id="slider">
+
+                    <div class="slider-text">
+                        GESER UNTUK MELANJUTKAN
+                    </div>
+
+                    <div class="slider-hint">
+                        »
+                    </div>
+
+                    <div
+                        class="slider-thumb"
+                        id="sliderThumb">
+
+                        →
+
+                    </div>
+
+                </div>
+
+                <div class="slider-status">
+                    DRAG_SYSTEM // READY
+                </div>
+
+                <div class="slider-decor">
+                    · ✦ · ♡ · ✦ ·
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="sticker">
+            a tiny message is waiting
+        </div>
+
+    </section>
+
+
+    <!-- FIRST MESSAGE -->
+
+    <section id="firstScene" class="screen hidden">
+
+        <div class="glass-box">
+
+            <div class="glass-tag">
+                MESSAGE_01
+            </div>
+
+            <p
+                class="message"
+                id="firstMessage">
+            </p>
+
+            <div
+                id="continueWrapper"
+                style="
+                    margin-top:25px;
+                    opacity:0;
+                    transition:opacity 1s;
+                    text-align:center;
+                ">
+
+                <button
+                    class="next-button"
+                    id="continueButton"
+                    style="
+                        width:65px;
+                        height:65px;
+                        border-radius:50%;
+                        border:1px solid #00ff66;
+                        background:rgba(0,255,100,.08);
+                        color:#00ff66;
+                        font-size:26px;
+                        cursor:pointer;
+                    ">
+                    →
+                </button>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- BIRD -->
+
+    <div class="bird-container" id="bird">
+
+        <div class="speech" id="speech">
+            hha, udah lama banget deh
+        </div>
+
+        <div class="bird">
+
+            <div class="bird-body">
+                <div class="bird-eye"></div>
+            </div>
+
+            <div class="bird-wing"></div>
+
+            <div class="bird-foot"></div>
+            <div class="bird-foot two"></div>
+
+        </div>
+
+    </div>
+
+
+    <!-- FIREWORKS -->
+
+    <section id="fireworks">
+
+        <canvas id="fireCanvas"></canvas>
+
+        <div id="hbd">
+            HBD
+        </div>
+
+    </section>
+
+
+    <!-- FINAL -->
+
+    <section id="finalScreen" class="screen">
+
+        <div class="glass-box final-box">
+
+            <div class="glass-tag">
+                MESSAGE_FINAL
+            </div>
+
+            <p
+                class="final-message"
+                id="finalMessage">
+            </p>
+
+            <div class="signature">
+
+                <span class="signature-main">
+                    Happy Birthday, Omega
+                </span>
+
+                <span class="signature-sub">
+                    — dari orang yang mungkin anda kenal
+                </span>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <div class="scanlines"></div>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   MATRIX
+========================================================= */
+
+const matrix =
+    document.getElementById("matrix");
+
+const chars =
+    "01{}[]<>/\\\\$#@%&*+=-_:;ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+for(let i=0;i<30;i++){
+
+    const code =
+        document.createElement("div");
+
+    code.className="code";
+
+    code.style.left =
+        Math.random()*100+"%";
+
+    code.style.animationDuration =
+        4+Math.random()*8+"s";
+
+    code.style.animationDelay =
+        -Math.random()*10+"s";
+
+    code.style.opacity =
+        .2+Math.random()*.65;
+
+    let text="";
+
+    for(let j=0;j<35;j++){
+
+        text+=
+            chars[
+                Math.floor(
+                    Math.random()*chars.length
+                )
+            ];
+
+    }
+
+    code.textContent=text;
+
+    matrix.appendChild(code);
+}
+
+
+/* =========================================================
+   ELEMENTS
+========================================================= */
+
+const opening =
+    document.getElementById("opening");
+
+const firstScene =
+    document.getElementById("firstScene");
+
+const slider =
+    document.getElementById("slider");
+
+const sliderThumb =
+    document.getElementById("sliderThumb");
+
+const continueButton =
+    document.getElementById("continueButton");
+
+const continueWrapper =
+    document.getElementById("continueWrapper");
+
+const firstMessage =
+    document.getElementById("firstMessage");
+
+const bird =
+    document.getElementById("bird");
+
+const speech =
+    document.getElementById("speech");
+
+const fireworks =
+    document.getElementById("fireworks");
+
+const hbd =
+    document.getElementById("hbd");
+
+const finalScreen =
+    document.getElementById("finalScreen");
+
+const finalMessage =
+    document.getElementById("finalMessage");
+
+
+/* =========================================================
+   TYPEWRITER
+========================================================= */
+
+function typeText(element,text,speed){
+
+    return new Promise(resolve=>{
+
+        let i=0;
+
+        element.textContent="";
+
+        function type(){
+
+            if(i<text.length){
+
+                element.textContent+=text[i];
+
+                i++;
+
+                setTimeout(type,speed);
+
+            }else{
+
+                resolve();
+
+            }
+
+        }
+
+        type();
+
+    });
+}
+
+
+/* =========================================================
+   REAL DRAG SLIDER
+========================================================= */
+
+let dragging=false;
+let startX=0;
+let startLeft=0;
+
+function getMaxLeft(){
+
+    return slider.clientWidth -
+           sliderThumb.clientWidth -
+           12;
+}
+
+function moveSlider(clientX){
+
+    const delta =
+        clientX-startX;
+
+    let newLeft =
+        startLeft+delta;
+
+    const max =
+        getMaxLeft();
+
+    newLeft =
+        Math.max(
+            6,
+            Math.min(max,newLeft)
+        );
+
+    sliderThumb.style.left =
+        newLeft+"px";
+
+    return newLeft;
+}
+
+function finishSlider(){
+
+    if(!dragging) return;
+
+    dragging=false;
+
+    const max =
+        getMaxLeft();
+
+    const current =
+        parseFloat(
+            sliderThumb.style.left
+        ) || 6;
+
+    if(current >= max*.82){
+
+        sliderThumb.style.left =
+            max+"px";
+
+        sliderThumb.innerHTML="✓";
+
+        setTimeout(
+            openFirstScene,
+            250
+        );
+
+    }else{
+
+        sliderThumb.style.left="6px";
+
+    }
+
+}
+
+sliderThumb.addEventListener(
+    "pointerdown",
+    e=>{
+
+        e.preventDefault();
+
+        dragging=true;
+
+        startX=e.clientX;
+
+        startLeft=
+            parseFloat(
+                sliderThumb.style.left
+            ) || 6;
+
+        sliderThumb.setPointerCapture(
+            e.pointerId
+        );
+
+    }
+);
+
+sliderThumb.addEventListener(
+    "pointermove",
+    e=>{
+
+        if(!dragging) return;
+
+        moveSlider(e.clientX);
+
+    }
+);
+
+sliderThumb.addEventListener(
+    "pointerup",
+    finishSlider
+);
+
+sliderThumb.addEventListener(
+    "pointercancel",
+    finishSlider
+);
+
+
+/* =========================================================
+   OPEN FIRST SCENE
+========================================================= */
+
+function openFirstScene(){
+
+    opening.classList.add("hidden");
+
+    setTimeout(()=>{
+
+        firstScene.classList.remove(
+            "hidden"
+        );
+
+        setTimeout(()=>{
+
+            bird.classList.add("fly");
+
+        },350);
+
+        setTimeout(()=>{
+
+            speech.classList.add("show");
+
+        },2100);
+
+        setTimeout(async()=>{
+
+            await typeText(
+                firstMessage,
+                "aku gak tahu cara berkata-kata untuk saat ini, tapi.........",
+                55
+            );
+
+            setTimeout(()=>{
+
+                continueWrapper.style.opacity="1";
+
+            },1200);
+
+        },2800);
+
+    },700);
+}
+
+
+/* =========================================================
+   FIREWORK CANVAS
+========================================================= */
+
+const canvas =
+    document.getElementById("fireCanvas");
+
+const ctx =
+    canvas.getContext("2d");
+
+let particles=[];
+
+function resizeCanvas(){
+
+    const ratio =
+        window.devicePixelRatio || 1;
+
+    canvas.width =
+        window.innerWidth*ratio;
+
+    canvas.height =
+        window.innerHeight*ratio;
+
+    canvas.style.width =
+        window.innerWidth+"px";
+
+    canvas.style.height =
+        window.innerHeight+"px";
+
+    ctx.setTransform(
+        ratio,0,0,ratio,0,0
+    );
+}
+
+resizeCanvas();
+
+window.addEventListener(
+    "resize",
+    resizeCanvas
+);
+
+
+/* =========================================================
+   PARTICLE
+========================================================= */
+
+class Particle{
+
+    constructor(x,y,angle,speed){
+
+        this.x=x;
+        this.y=y;
+
+        this.vx=
+            Math.cos(angle)*speed;
+
+        this.vy=
+            Math.sin(angle)*speed;
+
+        this.life=
+            70+Math.random()*40;
+
+        this.maxLife=
+            this.life;
+
+        this.size=
+            1+Math.random()*2;
+    }
+
+    update(){
+
+        this.x+=this.vx;
+        this.y+=this.vy;
+
+        this.vx*=.982;
+        this.vy*=.982;
+
+        this.vy+=.025;
+
+        this.life--;
+    }
+
+    draw(){
+
+        const alpha=
+            this.life/this.maxLife;
+
+        ctx.beginPath();
+
+        ctx.arc(
+            this.x,
+            this.y,
+            this.size,
+            0,
+            Math.PI*2
+        );
+
+        ctx.fillStyle=
+            `rgba(0,255,100,${alpha})`;
+
+        ctx.shadowBlur=15;
+        ctx.shadowColor="#00ff66";
+
+        ctx.fill();
+    }
+}
+
+
+/* =========================================================
+   EXPLOSION
+========================================================= */
+
+function explode(x,y,amount=100){
+
+    for(let i=0;i<amount;i++){
+
+        particles.push(
+            new Particle(
+                x,
+                y,
+                Math.random()*Math.PI*2,
+                1.5+Math.random()*5
+            )
+        );
+
+    }
+}
+
+let fireworksRunning=false;
+
+
+/* =========================================================
+   FIREWORK LOOP
+========================================================= */
+
+function animateFireworks(){
+
+    if(!fireworksRunning)
+        return;
+
+    ctx.fillStyle=
+        "rgba(0,0,0,.18)";
+
+    ctx.fillRect(
+        0,
+        0,
+        window.innerWidth,
+        window.innerHeight
+    );
+
+    particles=
+        particles.filter(
+            p=>p.life>0
+        );
+
+    particles.forEach(p=>{
+
+        p.update();
+        p.draw();
+
+    });
+
+    requestAnimationFrame(
+        animateFireworks
+    );
+}
+
+
+/* =========================================================
+   CONTINUE → FIREWORK
+========================================================= */
+
+continueButton.addEventListener(
+    "click",
+    ()=>{
+
+        firstScene.classList.add(
+            "hidden"
+        );
+
+        bird.style.opacity="0";
+
+        setTimeout(()=>{
+
+            fireworks.classList.add(
+                "active"
+            );
+
+            fireworksRunning=true;
+
+            animateFireworks();
+
+            setTimeout(()=>{
+
+                explode(
+                    window.innerWidth*.2,
+                    window.innerHeight*.35,
+                    110
+                );
+
+            },300);
+
+            setTimeout(()=>{
+
+                explode(
+                    window.innerWidth*.8,
+                    window.innerHeight*.3,
+                    110
+                );
+
+            },600);
+
+            setTimeout(()=>{
+
+                explode(
+                    window.innerWidth*.5,
+                    window.innerHeight*.25,
+                    150
+                );
+
+            },950);
+
+            setTimeout(()=>{
+
+                hbd.classList.add("show");
+
+            },1600);
+
+            setTimeout(()=>{
+
+                explode(
+                    window.innerWidth*.5,
+                    window.innerHeight*.7,
+                    160
+                );
+
+            },2200);
+
+            setTimeout(()=>{
+
+                explode(
+                    window.innerWidth*.15,
+                    window.innerHeight*.7,
+                    90
+                );
+
+                explode(
+                    window.innerWidth*.85,
+                    window.innerHeight*.7,
+                    90
+                );
+
+            },2700);
+
+
+            /* FINAL */
+
+            setTimeout(()=>{
+
+                fireworksRunning=false;
+
+                fireworks.classList.remove(
+                    "active"
+                );
+
+                hbd.classList.remove(
+                    "show"
+                );
+
+                finalScreen.classList.add(
+                    "show"
+                );
+
+                typeText(
+                    finalMessage,
+
+                    "hm... aku gak tahu apa yang harus aku ucapin, tapi aku ingat kamu pernah memberitahuku bahwa ini ulang tahunmu. dan saat itu aku berjanji untuk mengucapkan selamat saat tengah malam. aku menepati janjiku. hiduplah dengan baik, apapun kondisi mu. aku berharap yang terbaik untukmu.",
+
+                    30
+                );
+
+            },5100);
+
+        },750);
+
+    }
+);
+
+</script>
+
+</body>
+</html>
+```
